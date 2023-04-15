@@ -1,17 +1,16 @@
 $(document).ready(function (){
 
     const jsonUrl = '/json/shop';
-    let categoryId = 1;
+    let categoryId = getUrlVars()[1];
 
     $('#home').removeClass('active')
     $('#shop').addClass('active')
 
     $('.btn').on('click', function(){
-
         $('.btn').removeClass('active').addClass('inactive');
         $(this).removeClass('inactive').addClass('active');
         categoryId = $(this).attr('id');
-        localStorage.setItem('category', $(this).attr('id'));
+        window.history.replaceState({}, 'category', '/shop?category=' + categoryId + '&sort=' + getUrlVars()[2]);
         ajaxReq(categoryId);
     });
 
@@ -54,18 +53,12 @@ $(document).ready(function (){
         const sorted = [...elements].sort((a, b) => {
             const priceElA = a.querySelector(".card-text");
             const priceElB = b.querySelector(".card-text");
-            const getPrice = (el) => parseInt(el.innerHTML.replace(/ /g, ""));
+            const getPrice = (el) => parseFloat(el.innerHTML.replace(/ /g, ""));
             return getPrice(priceElA) - getPrice(priceElB);
         });
         const resultEl = document.querySelector("#content");
         resultEl.innerHTML = null;
         sorted.forEach(el => resultEl.appendChild(el));
-    }
-
-    function getSortingByPrice () {
-        document.querySelector('#sortingByPrice').addEventListener("click", () => {
-            sortingByPrice ();
-        });
     }
 
     function sortingByAlphabetically () {
@@ -88,12 +81,6 @@ $(document).ready(function (){
         sorted.forEach(el => resultEl.appendChild(el));
     }
 
-    function getSortingByAlphabetically () {
-        document.querySelector('#sortingByAlphabetically').addEventListener("click", () => {
-            sortingByAlphabetically ();
-        });
-    }
-
     function sortingByNewest () {
         const elements = document.querySelectorAll('.card');
         const sorted = [...elements].sort((a, b) => {
@@ -113,30 +100,60 @@ $(document).ready(function (){
         sorted.forEach(el => resultEl.appendChild(el));
     }
 
-    function getSortingByNewest () {
-        document.querySelector('#sortingByNewest').addEventListener("click", () => {
-            sortingByNewest ();
-        });
-    }
-
-    $('.btn-group').on('click', function() {
-        localStorage.setItem('sort', $(this).attr('id'));
-    });
-
     function startSort () {
-        if (localStorage.getItem('sort') === 'sortingByAlphabetically') {
+        if (getUrlVars()[2] === 'sortingByAlphabetically') {
             sortingByAlphabetically();
-        } else if (localStorage.getItem('sort') === 'sortingByNewest') {
+        }
+        if (getUrlVars()[2] === 'sortingByNewest') {
             sortingByNewest();
-        } else {
+        }
+        if (getUrlVars()[2] === 'sortingByPrice') {
             sortingByPrice();
         }
     }
 
-    ajaxReq (localStorage.getItem('category'));
-    getSortingByPrice();
-    getSortingByAlphabetically();
-    getSortingByNewest();
-    startSort();
+    document.querySelector('#sorting').addEventListener("change", function() {
+        if (this.value === "sortingByAlphabetically") {
+            window.history.replaceState({}, 'category', '/shop?category=' + categoryId + '&sort=' + this.value);
+            sortingByAlphabetically();
+        }
+        if (this.value === "sortingByPrice") {
+            window.history.replaceState({}, 'category', '/shop?category=' + categoryId + '&sort=' + this.value);
+            sortingByPrice();
+        }
+        if (this.value === "sortingByNewest") {
+            window.history.replaceState({}, 'category', '/shop?category=' + categoryId + '&sort=' + this.value);
+            sortingByNewest();
+        }
+
+    });
+
+    function getUrlVars() {
+        return window.location.href.slice(window.location.href.indexOf('?')).split(/[&?]{1}[\w\d]+=/);
+    }
+
+    function checkParametrs () {
+        if (getUrlVars()[1] === undefined && getUrlVars()[2] === undefined) {
+            window.history.replaceState({}, 'category', '/shop?category=1&sort=sortingByPrice');
+        }
+
+        if (getUrlVars()[1] === undefined) {
+            window.history.replaceState({}, 'category', '/shop?category=1&sort=' + getUrlVars()[2]);
+        }
+
+        if (getUrlVars()[2] === undefined) {
+            window.history.replaceState({}, 'category', '/shop?category=' + getUrlVars()[1] + '&sort=sortingByPrice');
+        }
+    }
+
+    function startActiveCatAndSort () {
+        $('#' + getUrlVars()[1]).addClass('active');
+        $("select option[value=" + getUrlVars()[2] + "]").attr('selected', 'true');
+    }
+
+    setTimeout(function () { startSort() }, 100);
+    ajaxReq (getUrlVars()[1]);
+    startActiveCatAndSort();
+    checkParametrs();
 
 });

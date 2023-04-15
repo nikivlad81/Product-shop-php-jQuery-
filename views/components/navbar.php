@@ -10,7 +10,7 @@
                     <a class="nav-link active" id="home" aria-current="page" href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="shop" href="/shop">Shop</a>
+                    <a class="nav-link" id="shop" href="/shop?category=1&sort=sortingByNewest">Shop</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="task" href="/task2">Task 2</a>

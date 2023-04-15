@@ -41,7 +41,7 @@ if ($_GET['check'] == null) {
         <div class="card-body ">
              <h5 class="card-title">Content created.</h5>
              <p class="card-text">Now you can go to the shop.</p>
-             <button type="button" class="btn btn-primary"><a href="/shop" style="color: white; text-decoration: none;">Shop!</a></button>
+             <button type="button" class="btn btn-primary"><a href="/shop?category=1&sort=sortingByNewest" style="color: white; text-decoration: none;">Shop!</a></button>
         </div>
     </div> <?php } ?>
 </div>
