@@ -41,6 +41,10 @@ Page::part('navbar');
 
                 </div>
 
+                <div class="row" id="modal-content">
+
+                </div>
+
             </div>
         </div>
     </div>

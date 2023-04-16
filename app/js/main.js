@@ -29,8 +29,8 @@ $(document).ready(function (){
                             'Date: <b><span class="card-date">' + value[4] + '</span></b><br><br>' +
                             'Price: $<b><span class="card-text" style="color: limegreen">' + value[2] + '</span></b><br><br>' +
                             '<button type="button" id="' + value[0] + '" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#staticBackdrop' + value[0] + '">Buy</button>' +
-                            '</div></div>' +
-                            '<div class="modal fade" id="staticBackdrop' + value[0] + '" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">' +
+                            '</div></div>');
+                        $('#modal-content').append('<div class="modal fade" id="staticBackdrop' + value[0] + '" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">' +
                             '<div class="modal-dialog">' +
                             '<div class="modal-content">' +
                             '<div class="modal-header">' +
