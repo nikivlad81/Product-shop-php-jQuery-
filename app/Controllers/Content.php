@@ -8,7 +8,8 @@ use App\Services\Database;
 class Content
 {
 
-    public static function getCategories () {
+    public static function getCategories()
+    {
         $database = new Database;
         $pdo = $database::start();
 
@@ -19,7 +20,8 @@ SQL;
         return $categories->fetchAll();
     }
 
-    public static function getContentForJson () {
+    public static function getContentForJson()
+    {
         $database = new Database;
         $pdo = $database::start();
 
@@ -30,65 +32,68 @@ SQL;
         return $categories->fetchAll();
     }
 
-    public static function getArrayTask2 () {
+    public static function getArrayTask2()
+    {
         $database = new Database;
         $pdo = $database::start();
 
         $sql = <<<'SQL'
 SELECT * FROM `category`;
 SQL;
-        $arr = $pdo->query($sql);
-        $arr = $arr->fetchAll();
-
-        $sql = <<<'SQL'
-SELECT DISTINCT parent_id FROM category ORDER by parent_id ASC ;
-SQL;
-        $numbers = $pdo->query($sql);
-        $numbers = $numbers->fetchAll();
-
-        $missingNum = [];
-        $num = 0;
-
-        foreach ($numbers as $number) {
-            if ( ($number['parent_id'] - $num) > 1) {
-                $missingNum[] = $num;
-                $num++;
-            }
-            if ( ($number['parent_id'] - $num) > 0) {
-                $missingNum[] = $num;
-                $num++;
-            }
-            $num++;
-        }
-
-
-        $newres = [];
-
-        foreach ($arr as $value) {
-            if ($value['parent_id'] == 0) {
-                $newres[$value['categories_id']][] = $value['categories_id'];
-            }
-        }
+        $arr = $pdo->query($sql)->fetchAll();
         $result = [];
-        foreach ($newres as $key => $value) {
-            foreach ($arr as $item) {
-                if ($item['parent_id'] == $key) {
-                    foreach ($arr as $res) {
-                        if ($item['categories_id'] == $res['parent_id']) {
-                            $result[$item['parent_id']][$item['categories_id']][$res['categories_id']] = $res['categories_id'];
-                        } else {
-                            foreach ($missingNum as $num) {
-                                if ($item['categories_id'] == $num) {
-                                    $result[$item['parent_id']][$item['categories_id']] = $num;
-                                }
-                            }
-                        }
+
+        function recur($arr, $result, $deep1 = null, $deep2 = null)
+        {
+            if (empty($result)) {
+                foreach ($arr as $item) {
+                    $parent_id = $item['parent_id'];
+                    $categories_id = $item['categories_id'];
+                    if ($parent_id == 0) {
+                        $result[$categories_id] = [];
                     }
                 }
             }
+
+            if ($deep1 != null && $deep2 == null) {
+                foreach ($arr as $item) {
+                    $parent_id = $item['parent_id'];
+                    $categories_id = $item['categories_id'];
+                    if ($parent_id == $deep1) {
+                        $result[$deep1][$categories_id] = [];
+                    }
+                }
+            }
+
+            if ($deep2 != null) {
+                foreach ($arr as $item) {
+                    $parent_id = $item['parent_id'];
+                    $categories_id = $item['categories_id'];
+                    if ($parent_id == $deep2) {
+                        $result[$deep1][$deep2][$categories_id] = $categories_id;
+                    }
+                }
+                if (is_array($result[$deep1][$deep2]) && empty($result[$deep1][$deep2])){
+                    $result[$deep1][$deep2] = $deep2;
+                }
+            }
+
+            if (!empty($result) && $deep1 == null) {
+                foreach ($result as $key => $value) {
+                    $result = recur($arr, $result, $key);
+                }
+            }
+            if ($deep1 == null) {
+                foreach ($result as $deep1 => $value) {
+                    foreach ($value as $key => $cat) {
+                        $result = recur($arr, $result, $deep1, $key);
+                    }
+                }
+            }
+            return $result;
         }
 
-        return $result;
+        return recur($arr, $result);
     }
 
 }
